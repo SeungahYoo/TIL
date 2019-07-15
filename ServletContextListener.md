@@ -73,3 +73,68 @@ java.util.Enumeration getIntParameterNames();
 	/* web.xml파일에 정의된 초기화 파라미터의 이름 목록을 Enumeration 타입으로 리턴. */
 ```
 
+
+
+
+
+- DB 연동 및 dao 생성에 적용
+
+
+
+InitListener.java
+
+```java
+public class InitListener implements ServletContextListener {
+
+	@Override
+	public void contextInitialized(ServletContextEvent sce) {
+		ServletContext context = sce.getServletContext();
+
+		try {
+			TodoDAO dao = new TodoDAO();
+			context.setAttribute("dao", dao);
+			String driver = context.getInitParameter("jdbcDriver");
+			Class.forName(driver);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public void contextDestroyed(ServletContextEvent sce) {
+		ServletContext context = sce.getServletContext();
+		context.removeAttribute("dao");
+	}
+
+}
+```
+
+
+
+web.xml
+
+```xml
+<web-app>
+	<listener>
+		<listener-class>com.nts.todo.loader.InitListener</listener-class>
+	</listener>
+	<context-param>
+		<param-name>jdbcDriver</param-name>
+		<param-value>com.mysql.jdbc.Driver</param-value>
+	</context-param>
+</web-app>
+
+```
+
+
+
+실제 사용 예
+
+```java
+ServletContext servletContext = this.getServletContext();
+TodoDAO dao = (TodoDAO)servletContext.getAttribute("dao");
+
+request.setAttribute("todos", dao.getTodos("TODO"));
+```
+
