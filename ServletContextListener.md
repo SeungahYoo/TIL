@@ -91,8 +91,6 @@ public class InitListener implements ServletContextListener {
 		ServletContext context = sce.getServletContext();
 
 		try {
-			TodoDAO dao = new TodoDAO();
-			context.setAttribute("dao", dao);
 			String driver = context.getInitParameter("jdbcDriver");
 			Class.forName(driver);
 		} catch (ClassNotFoundException e) {
@@ -127,14 +125,4 @@ web.xml
 
 ```
 
-
-
-실제 사용 예
-
-```java
-ServletContext servletContext = this.getServletContext();
-TodoDAO dao = (TodoDAO)servletContext.getAttribute("dao");
-
-request.setAttribute("todos", dao.getTodos("TODO"));
-```
 
